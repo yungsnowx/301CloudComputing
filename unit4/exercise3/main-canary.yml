@@ -55,7 +55,7 @@ jobs:
           images: |
             ${{ secrets.REGISTRY_LOGIN_SERVER }}/demoapp:${{ github.sha }}
           strategy: canary
-          traffic-split-method: smi
+          traffic-split-method: pod
           percentage: 20
           baseline-and-canary-replicas: 2
     
