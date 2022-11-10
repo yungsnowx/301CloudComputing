@@ -5,6 +5,10 @@ on:
       - unit4/exercise4/**
   workflow_dispatch:
   
+env:
+  IMAGE_TAG: 1
+
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -59,7 +63,7 @@ jobs:
             unit4/exercise4/service.yaml
             unit4/exercise4/deployment.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:${{ env.IMAGE_TAG }}
           strategy: canary
           action: deploy
           traffic-split-method: pod
@@ -105,7 +109,7 @@ jobs:
             unit4/exercise4/service.yaml
             unit4/exercise4/deployment.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:${{ env.IMAGE_TAG }}
           strategy: canary
           traffic-split-method: pod
           action: promote  #deploy is the default; we will later use this to promote/reject
@@ -121,7 +125,7 @@ jobs:
             unit4/exercise4/service.yaml
             unit4/exercise4/deployment.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:${{ env.IMAGE_TAG }}
           strategy: canary
           traffic-split-method: pod
           action: reject  #deploy is the default; we will later use this to promote/reject
