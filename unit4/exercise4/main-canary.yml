@@ -19,15 +19,15 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: 'Build and push the blue image'
+      - name: 'Build and push the blue image (v1)'
         run: |
-          docker build unit4/exercise4/blue/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:1
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:1
+          docker build unit4/exercise4/blue/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:1
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:1
 
-      - name: 'Build and push the green image'
+      - name: 'Build and push the green image (v2)'
         run: |
-          docker build unit4/exercise4/green/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
+          docker build unit4/exercise4/green/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
 
       - name: 'Azure login'
         id: login
@@ -46,10 +46,9 @@ jobs:
         id: install-kubectl
         uses: azure/setup-kubectl@v3
       
-      - name: Replace image name in manifests
+      - name: Replace image name in manifest
         run: |
-          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise4/deployment-blue.yaml
-          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise4/deployment-green.yaml
+          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise4/deployment.yaml
 
       - name: Deploy to AKS
         id: deploy-aks
@@ -58,9 +57,9 @@ jobs:
           namespace: default
           manifests: |
             unit4/exercise4/service.yaml
-            unit4/exercise4/deployment-blue.yaml
+            unit4/exercise4/deployment.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
           strategy: canary
           action: deploy
           traffic-split-method: pod
@@ -104,9 +103,9 @@ jobs:
           namespace: default
           manifests: |
             unit4/exercise4/service.yaml
-            unit4/exercise4/deployment-green.yaml
+            unit4/exercise4/deployment.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
           strategy: canary
           traffic-split-method: pod
           action: promote  #deploy is the default; we will later use this to promote/reject
@@ -120,9 +119,9 @@ jobs:
           namespace: default
           manifests: |
             unit4/exercise4/service.yaml
-            unit4/exercise4/deployment-blue.yaml
+            unit4/exercise4/deployment.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:2
           strategy: canary
           traffic-split-method: pod
           action: reject  #deploy is the default; we will later use this to promote/reject

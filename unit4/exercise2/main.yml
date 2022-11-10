@@ -52,6 +52,7 @@ jobs:
           namespace: 'default'
           manifests: |
             unit4/exercise2/deployment.yaml
+            unit4/exercise2/service.yaml
           images: |
             ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx:${{ github.sha }}
 
