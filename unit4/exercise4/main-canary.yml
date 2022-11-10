@@ -21,12 +21,12 @@ jobs:
 
       - name: 'Build and push the blue image'
         run: |
-          docker build unit4/exercise4/blue. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
+          docker build unit4/exercise4/blue/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
 
       - name: 'Build and push the green image'
         run: |
-          docker build unit4/exercise4/green. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+          docker build unit4/exercise4/green/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
 
       - name: 'Azure login'
