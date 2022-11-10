@@ -21,13 +21,13 @@ jobs:
 
       - name: 'Build and push the blue image'
         run: |
-          docker build unit4/exercise4/blue/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
+          docker build unit4/exercise4/blue/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:1
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:1
 
       - name: 'Build and push the green image'
         run: |
-          docker build unit4/exercise4/green/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+          docker build unit4/exercise4/green/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
 
       - name: 'Azure login'
         id: login
@@ -60,7 +60,7 @@ jobs:
             unit4/exercise4/service.yaml
             unit4/exercise4/deployment-blue.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
           strategy: canary
           action: deploy
           traffic-split-method: pod
@@ -106,7 +106,7 @@ jobs:
             unit4/exercise4/service.yaml
             unit4/exercise4/deployment-green.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
           strategy: canary
           traffic-split-method: pod
           action: promote  #deploy is the default; we will later use this to promote/reject
@@ -122,7 +122,7 @@ jobs:
             unit4/exercise4/service.yaml
             unit4/exercise4/deployment-blue.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:1
           strategy: canary
           traffic-split-method: pod
           action: reject  #deploy is the default; we will later use this to promote/reject
