@@ -100,6 +100,10 @@ jobs:
           resource-group: '${{ secrets.RESOURCE_GROUP_AKS }}' 
           cluster-name: '${{ secrets.CLUSTER_NAME }}'
 
+      - name: Replace image name in manifest
+        run: |
+          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise4/deployment.yaml
+
       - name: Promote App
         uses: azure/k8s-deploy@v4
         if: ${{ success() }}
