@@ -1,0 +1,37 @@
+apiVersion: apps/v1 
+kind: Deployment 
+metadata: 
+  name: nginx-deployment-blue 
+  labels: 
+    tier: application 
+spec: 
+  replicas: 3 
+  selector: 
+    matchLabels: 
+      run: nginx 
+  template: 
+    metadata: 
+      labels: 
+        run: nginx 
+    spec: 
+      containers: 
+      - name: nginx 
+        image: __REGISTRY-LOGIN-SERVER__/nginx-blue
+        ports: 
+        - containerPort: 80
+---
+apiVersion: v1 
+kind: Service 
+metadata: 
+  name: nginx-service 
+  labels: 
+    tier: networking 
+spec: 
+  ports: 
+  - port: 80 
+    targetPort: 80 
+    protocol: TCP 
+  selector: 
+    run: nginx
+  type: LoadBalancer 
+
