@@ -57,6 +57,7 @@ jobs:
         with:
           namespace: default
           manifests: |
+            unit4/exercise4/service.yaml
             unit4/exercise4/deployment-blue.yaml
           images: |
             ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
@@ -102,6 +103,7 @@ jobs:
         with:
           namespace: default
           manifests: |
+            unit4/exercise4/service.yaml
             unit4/exercise4/deployment-green.yaml
           images: |
             ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
@@ -117,6 +119,7 @@ jobs:
         with:
           namespace: default
           manifests: |
+            unit4/exercise4/service.yaml
             unit4/exercise4/deployment-blue.yaml
           images: |
             ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
