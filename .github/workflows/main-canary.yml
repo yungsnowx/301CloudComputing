@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   
 env:
-  IMAGE_TAG: 1
+  IMAGE_TAG: 2
 
 
 jobs:
