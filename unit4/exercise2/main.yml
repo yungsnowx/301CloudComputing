@@ -21,8 +21,8 @@ jobs:
 
       - name: 'Build and push the demoapp'
         run: |
-          docker build unit4/exercise2/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/demoapp:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/demoapp:${{ github.sha }}
+          docker build unit4/exercise2/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
 
       - name: 'Azure login'
         id: login
@@ -43,7 +43,7 @@ jobs:
       
       - name: Replace image name in manifest
         run: |
-          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise2/deployment.yaml
+          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise2/deployment-blue.yaml
 
       - name: Deploy to AKS
         id: deploy-aks
@@ -51,9 +51,9 @@ jobs:
         with:
           namespace: 'default'
           manifests: |
-            unit4/exercise2/deployment.yaml
+            unit4/exercise2/deployment-blue.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/demoapp:${{ github.sha }}
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-blue:${{ github.sha }}
 
       - name: 'Get public IP of demoapp'
         id: getip

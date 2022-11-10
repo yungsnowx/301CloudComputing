@@ -21,8 +21,8 @@ jobs:
 
       - name: 'Build and push the demoapp'
         run: |
-          docker build unit4/exercise4/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/demoapp:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/demoapp:${{ github.sha }}
+          docker build unit4/exercise4/. -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
 
       - name: 'Azure login'
         id: login
@@ -43,23 +43,79 @@ jobs:
       
       - name: Replace image name in manifest
         run: |
-          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise4/deployment.yaml
+          sed -i 's/__REGISTRY-LOGIN-SERVER__/${{ secrets.REGISTRY_LOGIN_SERVER }}/g' unit4/exercise4/deployment-green.yaml
 
       - name: Deploy to AKS
         id: deploy-aks
         uses: Azure/k8s-deploy@v4
         with:
-          namespace: 'default'
+          namespace: default
           manifests: |
-            unit4/exercise4/deployment.yaml
+            unit4/exercise4/deployment-green.yaml
           images: |
-            ${{ secrets.REGISTRY_LOGIN_SERVER }}/demoapp:${{ github.sha }}
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
           strategy: canary
           action: deploy
           traffic-split-method: pod
-          percentage: 50
+          percentage: 40
+          baseline-and-canary-replicas: 2
           
       - name: 'Get public IP of demoapp'
         id: getip
         run: |
           kubectl get service -l tier=networking
+
+  approveapp:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    environment: approveapp
+    steps:
+      - run: echo asked for approval
+
+  promotereject:
+    runs-on: ubuntu-latest
+    needs: approveapp
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 'Azure login'
+        id: login
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Set the target AKS cluster'
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: '${{ secrets.RESOURCE_GROUP_AKS }}' 
+          cluster-name: '${{ secrets.CLUSTER_NAME }}'
+
+      - name: Promote App
+        uses: azure/k8s-deploy@v4
+        if: ${{ success() }}
+        with:
+          namespace: default
+          manifests: |
+            unit4/exercise4/deployment-green.yaml
+          images: |
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+          strategy: canary
+          traffic-split-method: pod
+          action: promote  #deploy is the default; we will later use this to promote/reject
+          percentage: 40
+          baseline-and-canary-replicas: 2
+
+      - name: Reject App
+        uses: azure/k8s-deploy@v4
+        if: ${{ failure() }}
+        with:
+          namespace: default
+          manifests: |
+            unit4/exercise4/deployment-green.yaml
+          images: |
+            ${{ secrets.REGISTRY_LOGIN_SERVER }}/nginx-green:${{ github.sha }}
+          strategy: canary
+          traffic-split-method: pod
+          action: reject  #deploy is the default; we will later use this to promote/reject
+          percentage: 40
+          baseline-and-canary-replicas: 2

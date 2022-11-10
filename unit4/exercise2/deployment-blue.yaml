@@ -1,7 +1,7 @@
 apiVersion: apps/v1 
 kind: Deployment 
 metadata: 
-  name: nginx-deployment 
+  name: nginx-deployment-blue 
   labels: 
     tier: application 
 spec: 
@@ -16,7 +16,7 @@ spec:
     spec: 
       containers: 
       - name: nginx 
-        image: __REGISTRY-LOGIN-SERVER__/demoapp
+        image: __REGISTRY-LOGIN-SERVER__/nginx-blue
         ports: 
         - containerPort: 80
 ---
@@ -32,6 +32,6 @@ spec:
     targetPort: 80 
     protocol: TCP 
   selector: 
-    run: nginx 
+    run: nginx
   type: LoadBalancer 
 
